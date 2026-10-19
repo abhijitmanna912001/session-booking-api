@@ -75,7 +75,7 @@ export async function bookSession(sessionId: string, userId: string) {
         userId: new Types.ObjectId(userId),
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   );
   if (booked) {
     return booked;
@@ -95,7 +95,7 @@ export async function completeSession(sessionId: string) {
   const completed = await Session.findOneAndUpdate(
     { _id: sessionId, status: SessionStatus.BOOKED },
     { $set: { status: SessionStatus.COMPLETED, completedAt: new Date() } },
-    { new: true },
+    { returnDocument: "after" },
   );
   if (completed) {
     return completed;
