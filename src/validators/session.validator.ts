@@ -20,4 +20,14 @@ export const createSessionSchema = z
     path: ["endTime"],
   });
 
+export const availableSessionsQuerySchema = z.object({
+  dateTimestamp: z.coerce
+    .number({
+      message: "dateTimestamp must be a number (milliseconds since epoch)",
+    })
+    .int()
+    .positive()
+    .max(8.64e15, "dateTimestamp is out of range"),
+});
+
 export type CreateSessionInput = z.infer<typeof createSessionSchema>;
