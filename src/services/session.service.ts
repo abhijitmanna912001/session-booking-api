@@ -1,5 +1,7 @@
+import { Types } from "mongoose";
 import { Session, SessionStatus } from "../models/session.model";
 import { Teacher } from "../models/teacher.model";
+import { User } from "../models/user.model";
 import { AppError } from "../utils/AppError";
 import type { CreateSessionInput } from "../validators/session.validator";
 
@@ -57,4 +59,34 @@ export async function createSession(input: CreateSessionInput) {
     startTime: input.startTime,
     endTime: input.endTime,
   });
+}
+
+export async function bookSession(sessionId: string, userId: string) {
+  const userExists = await User.exists({ _id: userId });
+  if (!userExists) {
+    throw new AppError(404, "User not found");
+  }
+
+  const booked = await Session.findOneAndUpdate(
+    { _id: sessionId, status: SessionStatus.AVAILABLE },
+    {
+      $set: {
+        status: SessionStatus.BOOKED,
+        userId: new Types.ObjectId(userId),
+      },
+    },
+    { new: true },
+  );
+  if (booked) {
+    return booked;
+  }
+
+  const existing = await Session.findById(sessionId).select("status");
+  if (!existing) {
+    throw new AppError(404, "Session not found");
+  }
+  throw new AppError(
+    409,
+    `Session cannot be booked, current status is ${existing.status}`,
+  );
 }
