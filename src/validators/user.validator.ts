@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+export const userIdParamSchema = z.object({
+  id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Must be a valid ObjectId"),
+});
+
 export const createUserSchema = z.object({
   fullName: z.string().trim().min(1, "fullName is required"),
   email: z.string().trim().toLowerCase().pipe(z.email("Invalid email address")),
