@@ -33,3 +33,12 @@ export async function bookSession(req: Request, res: Response): Promise<void> {
   const session = await sessionService.bookSession(id, userId);
   res.status(200).json({ success: true, data: session });
 }
+
+export async function completeSession(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { id } = sessionIdParamSchema.parse(req.params);
+  const session = await sessionService.completeSession(id);
+  res.status(200).json({ success: true, data: session });
+}

@@ -90,3 +90,23 @@ export async function bookSession(sessionId: string, userId: string) {
     `Session cannot be booked, current status is ${existing.status}`,
   );
 }
+
+export async function completeSession(sessionId: string) {
+  const completed = await Session.findOneAndUpdate(
+    { _id: sessionId, status: SessionStatus.BOOKED },
+    { $set: { status: SessionStatus.COMPLETED, completedAt: new Date() } },
+    { new: true },
+  );
+  if (completed) {
+    return completed;
+  }
+
+  const existing = await Session.findById(sessionId).select("status");
+  if (!existing) {
+    throw new AppError(404, "Session not found");
+  }
+  throw new AppError(
+    409,
+    `Only BOOKED sessions can be completed, current status is ${existing.status}`,
+  );
+}
